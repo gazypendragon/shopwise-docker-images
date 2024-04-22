@@ -1,11 +1,10 @@
-# Use the latest version of the Amazon Linux base image
 FROM amazonlinux:2
 
-# Update all installed packages to thier latest versions
+# Update all installed packages to their latest versions
 RUN yum update -y 
 
 # Install the unzip package, which we will use it to extract the web files from the zip folder
-RUN yum install unzip -y
+RUN yum install -y unzip
 
 # Install wget package, which we will use it to download files from the internet 
 RUN yum install -y wget
@@ -92,7 +91,7 @@ RUN sed -i '/<Directory "\/var\/www\/html">/,/<\/Directory>/ s/AllowOverride Non
 # Give full access to the /var/www/html directory
 RUN chmod -R 777 /var/www/html
 
-Give full access to the storage directory
+# Give full access to the storage directory
 RUN chmod -R 777 storage/
 
 # Use the sed command to search the .env file for a line that starts with APP_ENV= and replace everything after the = character
@@ -124,3 +123,5 @@ EXPOSE 80 3306
 
 # Start Apache and MySQL
 ENTRYPOINT ["/usr/sbin/httpd", "-D", "FOREGROUND"]
+
+##
