@@ -2,12 +2,12 @@
 FROM amazonlinux:2023
 
 # Update all installed packages to their latest versions
-RUN yum update -y 
+RUN yum update -y
 
 # Install the unzip package, which we will use it to extract the web files from the zip folder
 RUN yum install unzip -y
 
-# Install wget package, which we will use it to download files from the internet 
+# Install wget package, which we will use it to download files from the internet
 RUN yum install -y wget
 
 # Install Apache
@@ -29,6 +29,10 @@ RUN yum install -y \
     php-fpm \
     php-intl \
     php-zip
+
+# Install OpenSSL libraries
+RUN yum install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+RUN yum install -y openssl-libs
 
 # Download and install the MySQL repository package
 RUN wget https://dev.mysql.com/get/mysql80-community-release-el7-3.noarch.rpm
@@ -55,8 +59,8 @@ ARG RDS_DB_NAME
 ARG RDS_DB_USERNAME
 ARG RDS_DB_PASSWORD
 
-# Use the build argument to set environment variables 
-ENV PERSONAL_ACCESS_TOKEN=$PERSONAL_ACCESS_TOKEN 
+# Use the build argument to set environment variables
+ENV PERSONAL_ACCESS_TOKEN=$PERSONAL_ACCESS_TOKEN
 ENV GITHUB_USERNAME=$GITHUB_USERNAME
 ENV REPOSITORY_NAME=$REPOSITORY_NAME
 #ENV WEB_FILE_ZIP=$WEB_FILE_ZIP
@@ -80,7 +84,7 @@ RUN cp -av ${REPOSITORY_NAME}/. /var/www/html
 RUN rm -rf ${REPOSITORY_NAME}
 
 # Enable the mod_rewrite setting in the httpd.conf file
-RUN sed -i '/<Directory "\/var\/www\/html">/,/<\/Directory>/ s/AllowOverride None/AllowOverride All/' /etc/httpd/conf/httpd.conf
+RUN sed -i '/<Directory "\\/var\\/www\\/html">/,/<\\/Directory>/ s/AllowOverride None/AllowOverride All/' /etc/httpd/conf/httpd.conf
 
 # Give full access to the /var/www/html directory
 RUN chmod -R 777 /var/www/html
@@ -89,22 +93,22 @@ RUN chmod -R 777 /var/www/html
 RUN chmod -R 777 storage/
 
 # Use the sed command to search the .env file for a line that starts with APP_ENV= and replace everything after the = character
-RUN sed -i '/^APP_ENV=/ s/=.*$/=production/' .env
+RUN sed -i '/^APP_ENV=/ s/=.\*$/=production/' .env
 
 # Use the sed command to search the .env file for a line that starts with APP_URL= and replace everything after the = character
-RUN sed -i "/^APP_URL=/ s/=.*$/=https:\/\/${DOMAIN_NAME}\//" .env
+RUN sed -i "/^APP_URL=/ s/=.\*$/=https:\\/\\/${DOMAIN_NAME}\\//" .env
 
 # Use the sed command to search the .env file for a line that starts with DB_HOST= and replace everything after the = character
-RUN sed -i "/^DB_HOST=/ s/=.*$/=${RDS_ENDPOINT}/" .env
+RUN sed -i "/^DB_HOST=/ s/=.\*$/=${RDS_ENDPOINT}/" .env
 
 # Use the sed command to search the .env file for a line that starts with DB_DATABASE= and replace everything after the = character
-RUN sed -i "/^DB_DATABASE=/ s/=.*$/=${RDS_DB_NAME}/" .env
+RUN sed -i "/^DB_DATABASE=/ s/=.\*$/=${RDS_DB_NAME}/" .env
 
 # Use the sed command to search the .env file for a line that starts with DB_USERNAME= and replace everything after the = character
-RUN  sed -i "/^DB_USERNAME=/ s/=.*$/=${RDS_DB_USERNAME}/" .env
+RUN  sed -i "/^DB_USERNAME=/ s/=.\*$/=${RDS_DB_USERNAME}/" .env
 
 # Use the sed command to search the .env file for a line that starts with DB_PASSWORD= and replace everything after the = character
-RUN  sed -i "/^DB_PASSWORD=/ s/=.*$/=${RDS_DB_PASSWORD}/" .env
+RUN  sed -i "/^DB_PASSWORD=/ s/=.\*$/=${RDS_DB_PASSWORD}/" .env
 
 # Print the .env file to review values
 RUN cat .env
